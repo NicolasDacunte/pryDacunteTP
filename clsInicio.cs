@@ -13,6 +13,8 @@ namespace pryDacunteTP
         OleDbConnection conexionBD;
         OleDbCommand comandoBD;
         OleDbDataReader lectorBD;
+        OleDbDataAdapter adaptador;
+        DataSet objDataSet = new DataSet();
         
 
         public string EstadoConexion = "";
@@ -22,7 +24,7 @@ namespace pryDacunteTP
         {
             try
             {
-                conexionBD = new OleDbConnection(@"Provider = Microsoft.ACE.OLEDB.12.0;" + "Data Source =C:\\Users\\Alumno\\source\\repos\\pryDacunteTP\bin\\Debug\\EMPLEADO.accdb");
+                conexionBD = new OleDbConnection(@"Provider = Microsoft.ACE.OLEDB.12.0;" + "Data Source = C:\\Users\\sistema\\Source\\Repos\\pryDacunteTP\\resources\\EMPLEADO.accdb");
                 conexionBD.Open();
                 EstadoConexion = "Conectado";
             }
@@ -32,84 +34,161 @@ namespace pryDacunteTP
             }
         }
 
-        public void CrearUsuario(string Nombre, string Apellido, string Direccion, string Ciudad, string Telefono, DateTime Nacimiento)
+        public void CrearUsuario(int Codigo,string Nombre, string Apellido, string Direccion, string Ciudad, string Telefono, DateTime Nacimiento)
         {
-            OleDbCommand comandoBD = new OleDbCommand();
-            OleDbDataAdapter adaptador;
-            DataSet objds = new DataSet(); // objeto DataSet a usar  
+            ConectarBD();
+            comandoBD = new OleDbCommand();
 
-            try
+            comandoBD.Connection = conexionBD;
+
+
+            // Establece el tipo de comando y la tabla
+            comandoBD.CommandType = System.Data.CommandType.TableDirect;
+            //Que tabla traigo
+            comandoBD.CommandText = "DATOS PERSONALES";
+
+
+
+            // crear el objeto DataAdapter pasando como parámetro el objeto comando que queremos vincular
+            adaptador = new OleDbDataAdapter(comandoBD);
+            // ejecutar la lectura de la tabla y almacenar su contenido en el dataAdapter
+            adaptador.Fill(objDataSet, "DATOS PERSONALES");
+            // obtenemos una referencia a la tabla
+
+
+            DataTable dt = objDataSet.Tables["DATOS PERSONALES"];
+
+            // creamos el nuevo DataRow con la estructura de campos de la tabla
+            DataRow nuevoregistro = dt.NewRow();
+            // asignamos los valores a todos los campos del DataRow
+            nuevoregistro["CODIGO"] = Codigo;
+            nuevoregistro["NOMBRE"] = Nombre;
+            nuevoregistro["APELLIDO"] = Apellido;
+            nuevoregistro["DIRECCIÒN"] = Direccion;
+            nuevoregistro["CIUDAD"] = Ciudad;
+            nuevoregistro["TELEFONO"] = Telefono;
+            nuevoregistro["FECHA_NACIMIENTO"] = Nacimiento;
+            // agregamos el DataRow a la tabla
+
+            dt.Rows.Add(nuevoregistro);
+
+            // creamos el objeto OledBCommandBuilder pasando como parámetro el DataAdapter
+            OleDbCommandBuilder cb = new OleDbCommandBuilder(adaptador);
+
+            // actualizamos la base con los cambios realizados
+            adaptador.Update(objDataSet, "DATOS PERSONALES");
+            conexionBD.Close();
+
+            MessageBox.Show("El Empleado se cargo correctamente");
+        }
+        public void TraerDatos(DataGridView dgv)
+        {
+            ConectarBD();
+            dgv.Rows.Clear();
+            //instancia un objeto en la memoria
+            comandoBD = new OleDbCommand();
+
+            comandoBD.Connection = conexionBD;
+            comandoBD.CommandType = System.Data.CommandType.TableDirect;
+            comandoBD.CommandText = "DATOS PERSONALES";
+
+            lectorBD = comandoBD.ExecuteReader();
+
+            dgv.Columns.Add("Codigo", "Codigo");
+            dgv.Columns.Add("Nombre", "Nombre");
+            dgv.Columns.Add("Apellido", "Apellido");
+            dgv.Columns.Add("Direccion", "Direccion");
+            dgv.Columns.Add("Ciudad", "Ciudad");
+            dgv.Columns.Add("Telefono", "Telefono");
+            dgv.Columns.Add("Fecha de nacimiento", "Fecha de nacimiento");
+
+            //leo como si fuera un archivo
+            if (lectorBD.HasRows)
             {
-                // establecer las propiedades al objeto comando
-                comandoBD.Connection = conexionBD;
-                comandoBD.CommandType = CommandType.TableDirect;
-                // Que tabla traigo
-                comandoBD.CommandText = "Usuarios";
-
-                // abrir la tabla y mostrar por renglón
-                lectorBD = comandoBD.ExecuteReader();
-
-                // Verificar si TIENE FILAS
-                if (lectorBD.HasRows)
+                while (lectorBD.Read())
                 {
-                    while (lectorBD.Read()) // mientras pueda leer, mostrar (leer)
-                    {
-                        if (lectorBD[1].ToString() == Nombre)
-                        {
-                            MessageBox.Show("Ya existe este Usuario");
-                            return; // Salir del método si ya existe el usuario
-                        }
-                    }
+
+                    dgv.Rows.Add(lectorBD[0], lectorBD[1], lectorBD[2], lectorBD[3], lectorBD[4], lectorBD[5], lectorBD[6]);
+
                 }
 
-                // Cerrar el DataReader después de usarlo para evitar conflictos
-                lectorBD.Close();
-
-                // Crear el objeto DataAdapter pasando como parámetro el objeto comando que queremos vincular
-                adaptador = new OleDbDataAdapter(comandoBD);
-
-                // Ejecutar la lectura de la tabla y almacenar su contenido en el dataAdapter
-                adaptador.Fill(objds, "Usuarios");
-
-                // Obtener una referencia a la tabla de Usuarios
-                DataTable tabla = objds.Tables["Usuarios"];
-
-                // Crear el nuevo DataRow con la estructura de campos de la tabla Usuarios
-                DataRow nuevoRegistro = tabla.NewRow();
-
-                // Asignar los valores a todos los campos del DataRow
-                nuevoRegistro["NOMBRE"] = Nombre;
-                nuevoRegistro["APELLIDO"] = Apellido;
-                nuevoRegistro["DIRECCION"] = Direccion;
-                nuevoRegistro["CIUDAD"] = Ciudad;
-                nuevoRegistro["TELEFONO"] = Telefono;
-                nuevoRegistro["FECHA_NAC"] = Nacimiento;
-
-                // Agregar el DataRow a la tabla Usuarios
-                tabla.Rows.Add(nuevoRegistro);
-
-                // Crear el objeto OleDbCommandBuilder pasando como parámetro el DataAdapter
-                OleDbCommandBuilder cb = new OleDbCommandBuilder(adaptador);
-
-                // Actualizar la base con los cambios realizados
-                adaptador.Update(objds, "NOMBRE");
-
-                MessageBox.Show("Usuario creado con éxito");
             }
-            catch (Exception ex)
+        }
+
+        int encontrado = 0;
+        public void BuscarPorApellido(string codigo, DataGridView dgv)
+        {
+            ConectarBD();
+            dgv.Rows.Clear();
+            comandoBD = new OleDbCommand();
+
+            comandoBD.Connection = conexionBD;
+            //q operacion quiero hacer y que me traiga TODA la tabla con el tabledirect
+            comandoBD.CommandType = System.Data.CommandType.TableDirect;
+            //Que tabla traigo
+            comandoBD.CommandText = "DATOS PERSONALES";
+            //abre la tabla y muestra por renglon
+            lectorBD = comandoBD.ExecuteReader();
+
+            //SI TIENE FILAS
+            if (lectorBD.HasRows)
             {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-            finally
-            {
-                // Asegurarse de cerrar el DataReader en el bloque finally
-                if (lectorBD != null && !lectorBD.IsClosed)
+                encontrado = 0;
+                while (lectorBD.Read()) //mientras pueda leer, mostrar
                 {
-                    lectorBD.Close();
+                    if (lectorBD[4].ToString() == codigo)
+                    {
+                        dgv.Rows.Add(lectorBD[0], lectorBD[1], lectorBD[2], lectorBD[3], lectorBD[4], lectorBD[5], lectorBD[6]);
+                        encontrado = 1;
+
+                    }
+                }
+                conexionBD.Close();
+
+                if (encontrado == 0)
+                {
+                    MessageBox.Show("Apellido " + codigo + " no esta cargado en el sistema");
+                    TraerDatos(dgv);
                 }
             }
         }
 
+        public void BuscarPorCiudad(string codigo, DataGridView dgv)
+        {
+            ConectarBD();
+            dgv.Rows.Clear();
+            comandoBD = new OleDbCommand();
 
+            comandoBD.Connection = conexionBD;
+            //q tipo de operacion quierp hacer y que me traiga TOD la tabla con el tabledirect
+            comandoBD.CommandType = System.Data.CommandType.TableDirect;
+            //Que tabla traigo
+            comandoBD.CommandText = "DATOS PERSONALES";
+            //abre la tabla y muestra por renglon
+            lectorBD = comandoBD.ExecuteReader();
+
+
+            //SI TIENE FILAS
+            if (lectorBD.HasRows)
+            {
+                encontrado = 0;
+                while (lectorBD.Read()) //mientras pueda leer, mostrar (leer)
+                {
+                    if (lectorBD[2].ToString() == codigo)
+                    {
+                        dgv.Rows.Add(lectorBD[0], lectorBD[1], lectorBD[2], lectorBD[3], lectorBD[4], lectorBD[5], lectorBD[6]);
+                        encontrado = 1;
+
+                    }
+                }
+                conexionBD.Close();
+
+                if (encontrado == 0)
+                {
+                    MessageBox.Show("No se encontro ningun empleado cargado en la ciudad " + codigo);
+                    TraerDatos(dgv);
+                }
+            }
+        }
     }
 }

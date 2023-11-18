@@ -20,9 +20,7 @@ namespace pryDacunteTP
             objInicio.ConectarBD();
         }
         private void frmRegistrar_Load(object sender, EventArgs e)
-        {
-            
-            this.TableAdapter.Fill(this.empleadosDataSet.Usuarios);
+        {         
 
         }
         private void label2_Click(object sender, EventArgs e)
@@ -34,10 +32,10 @@ namespace pryDacunteTP
         {
             if (txtNombre.Text != "" && txtApellido.Text != "")
             {
-                
-                
-                objInicio.CrearUsuario(txtNombre.Text, txtApellido.Text, txtDireccion.Text, txtCiudad.Text,txtTelefono.Text, dtNac.Value);
-                txtNombre.Focus();
+                int codigo = Convert.ToInt32(txtCodigo.Text);
+                objInicio.CrearUsuario(codigo,txtNombre.Text, txtApellido.Text, txtDireccion.Text, txtCiudad.Text,txtTelefono.Text, dtNac.Value);
+                txtCodigo.Focus();
+                txtCodigo.Text = "";
                 txtNombre.Text = "";
                 txtApellido.Text = "";
                 txtDireccion.Text = "";
@@ -53,6 +51,21 @@ namespace pryDacunteTP
 
         }
 
-        
+        private void btnCancelar_Click(object sender, EventArgs e)
+        {
+            txtCodigo.Clear();
+            txtNombre.Clear();
+            txtApellido.Clear();
+            txtTelefono.Clear();
+            txtDireccion.Clear();
+            txtCiudad.Clear();
+        }
+
+        private void btnVolver_Click(object sender, EventArgs e)
+        {
+            frmMenu menu = new frmMenu();
+            this.Hide();
+            menu.Show();
+        }
     }
 }

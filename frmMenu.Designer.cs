@@ -1,6 +1,6 @@
 ﻿namespace pryDacunteTP
 {
-    partial class Form1
+    partial class frmMenu
     {
         /// <summary>
         /// Variable del diseñador necesaria.
@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.archivoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.registroDeEmpleadosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -39,6 +40,7 @@
             this.herramientasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ayudaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblConectar = new System.Windows.Forms.Label();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -72,12 +74,14 @@
             this.registroDeEmpleadosToolStripMenuItem.Name = "registroDeEmpleadosToolStripMenuItem";
             this.registroDeEmpleadosToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.registroDeEmpleadosToolStripMenuItem.Text = "Registro de Empleados";
+            this.registroDeEmpleadosToolStripMenuItem.Click += new System.EventHandler(this.registroDeEmpleadosToolStripMenuItem_Click);
             // 
             // abrirToolStripMenuItem
             // 
             this.abrirToolStripMenuItem.Name = "abrirToolStripMenuItem";
             this.abrirToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.abrirToolStripMenuItem.Text = "Abrir";
+            this.abrirToolStripMenuItem.Click += new System.EventHandler(this.abrirToolStripMenuItem_Click);
             // 
             // imprimirToolStripMenuItem
             // 
@@ -118,22 +122,27 @@
             // lblConectar
             // 
             this.lblConectar.AutoSize = true;
-            this.lblConectar.Location = new System.Drawing.Point(12, 349);
+            this.lblConectar.Location = new System.Drawing.Point(12, 344);
             this.lblConectar.Name = "lblConectar";
             this.lblConectar.Size = new System.Drawing.Size(69, 13);
             this.lblConectar.TabIndex = 1;
             this.lblConectar.Text = "Fecha y hora";
             this.lblConectar.Click += new System.EventHandler(this.lblConectar_Click);
             // 
-            // Form1
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // frmMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(384, 371);
+            this.ClientSize = new System.Drawing.Size(384, 366);
             this.Controls.Add(this.lblConectar);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "Form1";
+            this.Name = "frmMenu";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
@@ -156,6 +165,7 @@
         private System.Windows.Forms.ToolStripMenuItem herramientasToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ayudaToolStripMenuItem;
         private System.Windows.Forms.Label lblConectar;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 
